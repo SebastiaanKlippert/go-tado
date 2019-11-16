@@ -1,0 +1,7 @@
+language: go
+go:
+  - 1.13
+  - tip
+script: go test -v -coverprofile=coverage.txt -covermode=atomic -race ./...
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
