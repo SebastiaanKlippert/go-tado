@@ -1,7 +1,8 @@
-package tado_auth
+package tadoauth
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,6 +19,7 @@ const (
 
 var endpoint = defaultEndpoint
 
+// GetToken returns a new authentication and refresh token for a user
 func GetToken(username, password string) (*TokenResponse, error) {
 	// set form data
 	data := url.Values{}
@@ -43,7 +45,7 @@ func GetToken(username, password string) (*TokenResponse, error) {
 			return nil, fmt.Errorf("authentication error: %s", err)
 		}
 		// check if it is a JSON error response
-		ae := new(AthenticationError)
+		ae := new(AuthenticationError)
 		err = json.Unmarshal(body, ae)
 		if err == nil {
 			//no unmarshal error, this is a JSON error response, return this as error
@@ -61,4 +63,10 @@ func GetToken(username, password string) (*TokenResponse, error) {
 	}
 
 	return tr, nil
+}
+
+// RefreshToken exchanges a refresh token for a new authentication token
+// Not yet implemented!
+func RefreshToken(refreshToken string) (*TokenResponse, error) {
+	return nil, errors.New("not implemented")
 }

@@ -1,4 +1,4 @@
-package tado_auth
+package tadoauth
 
 import (
 	"fmt"
