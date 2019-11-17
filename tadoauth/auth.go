@@ -2,7 +2,6 @@ package tadoauth
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,16 +18,11 @@ const (
 
 var endpoint = defaultEndpoint
 
-// GetToken returns a new authentication and refresh token for a user
-func GetToken(username, password string) (*TokenResponse, error) {
-	// set form data
-	data := url.Values{}
+func do(data url.Values) (*TokenResponse, error) {
+	// set common form data
 	data.Set("client_id", clientID)
 	data.Set("client_secret", clientSecret)
 	data.Set("scope", scope)
-	data.Set("grant_type", "password")
-	data.Set("username", username)
-	data.Set("password", password)
 
 	// post form
 	resp, err := http.PostForm(endpoint, data)
@@ -65,8 +59,21 @@ func GetToken(username, password string) (*TokenResponse, error) {
 	return tr, nil
 }
 
+// GetToken returns a new authentication and refresh token for a user
+func GetToken(username, password string) (*TokenResponse, error) {
+	// set form data
+	data := url.Values{}
+	data.Set("grant_type", "password")
+	data.Set("username", username)
+	data.Set("password", password)
+	return do(data)
+}
+
 // RefreshToken exchanges a refresh token for a new authentication token
-// Not yet implemented!
 func RefreshToken(refreshToken string) (*TokenResponse, error) {
-	return nil, errors.New("not implemented")
+	// set form data
+	data := url.Values{}
+	data.Set("grant_type", "refresh_token")
+	data.Set("refresh_token", refreshToken)
+	return do(data)
 }

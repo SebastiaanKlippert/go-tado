@@ -20,7 +20,6 @@ func (th *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestGetToken(t *testing.T) {
-
 	incomingBody := ""
 	responseBody := ""
 	responseStatusCode := 0
@@ -105,5 +104,38 @@ func TestGetToken(t *testing.T) {
 		assert.Equal(t, "fedCBA", tokenResponse.RefreshToken)
 		assert.Equal(t, "home.user", tokenResponse.Scope)
 		assert.Equal(t, 599, tokenResponse.ExpiresIn)
+	}
+}
+
+func TestRefreshToken(t *testing.T) {
+	incomingBody := ""
+	responseBody := ""
+	responseStatusCode := 0
+
+	// create test handler for mock auth server
+	th := &testHandler{
+		hf: func(w http.ResponseWriter, r *http.Request) {
+			s, _ := ioutil.ReadAll(r.Body)
+			incomingBody = string(s)
+			w.WriteHeader(responseStatusCode)
+			_, _ = fmt.Fprint(w, responseBody)
+		},
+	}
+
+	// start mock server
+	testServer := httptest.NewServer(th)
+	endpoint = testServer.URL
+	defer func() { endpoint = defaultEndpoint }()
+
+	// test incoming request
+	responseStatusCode = http.StatusOK
+	responseBody = `{"access_token": "t0ken"}`
+
+	tokenResponse, err := RefreshToken("ABCdef123")
+
+	assert.Equal(t, "client_id=tado-web-app&client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc&grant_type=refresh_token&refresh_token=ABCdef123&scope=home.user", incomingBody)
+	assert.NoError(t, err)
+	if assert.NotNil(t, tokenResponse) {
+		assert.Equal(t, "t0ken", tokenResponse.AccessToken)
 	}
 }
