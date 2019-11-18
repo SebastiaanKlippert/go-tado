@@ -19,7 +19,7 @@ func (c *Client) do(in input, out interface{}) error {
 	}
 
 	// encode input as JSON if needed
-	var body io.Reader = nil
+	var body io.Reader
 	switch in.method() {
 	case http.MethodPost, http.MethodPut:
 		buf := new(bytes.Buffer)
