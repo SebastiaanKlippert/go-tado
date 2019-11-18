@@ -11,10 +11,6 @@ import (
 
 const defaultBaseURL = "https://my.tado.com/api"
 
-var (
-	baseURL = defaultBaseURL
-)
-
 func (c *Client) do(in input, out interface{}) error {
 	// ensure accesstoken is still valid
 	err := c.validateAccessToken()
@@ -35,7 +31,7 @@ func (c *Client) do(in input, out interface{}) error {
 	}
 
 	// create HTTP request
-	req, err := http.NewRequest(in.method(), baseURL+in.path(), body)
+	req, err := http.NewRequest(in.method(), c.baseURL+in.path(), body)
 	if err != nil {
 		return err
 	}
@@ -58,7 +54,7 @@ func (c *Client) do(in input, out interface{}) error {
 			return fmt.Errorf("HTTP error: %s", err)
 		}
 		// return the body as error
-		return fmt.Errorf("authentication error: HTTP status %d: %s", resp.StatusCode, string(body))
+		return fmt.Errorf("error: HTTP status %d: %s", resp.StatusCode, string(body))
 	}
 
 	// OK response, decode into output

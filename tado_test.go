@@ -23,6 +23,7 @@ func TestNewClient(t *testing.T) {
 	assert.NotNil(t, c.HTTPClient, "HTTP client is nil")
 	assert.NotNil(t, c.mutex, "mutex is nil")
 	assert.Equal(t, tr, c.tr, "tr is nil")
+	assert.Equal(t, defaultBaseURL, c.baseURL, "baseURL is incorrect")
 	assert.True(t, time.Now().Before(c.accessTokenValidUntil), "accessTokenValidUntil invalid, have %s", c.accessTokenValidUntil)
 }
 

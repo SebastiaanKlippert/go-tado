@@ -36,6 +36,8 @@ func TestGetToken(t *testing.T) {
 
 	// start mock server
 	testServer := httptest.NewServer(th)
+	defer testServer.Close()
+	// set mock endpoint
 	endpoint = testServer.URL
 	defer func() { endpoint = defaultEndpoint }()
 

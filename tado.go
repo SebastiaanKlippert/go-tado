@@ -11,6 +11,7 @@ import (
 // Client is the main client used to communicate with the Tado API.
 type Client struct {
 	HTTPClient            *http.Client
+	baseURL               string
 	tr                    *tadoauth.TokenResponse
 	accessTokenValidUntil time.Time
 	mutex                 *sync.Mutex
@@ -20,9 +21,10 @@ type Client struct {
 func NewClient(tokenResp *tadoauth.TokenResponse) *Client {
 	return &Client{
 		accessTokenValidUntil: time.Now().Add(time.Duration(tokenResp.ExpiresIn) * time.Second),
-		mutex:      new(sync.Mutex),
-		tr:         tokenResp,
-		HTTPClient: http.DefaultClient,
+		baseURL:               defaultBaseURL,
+		mutex:                 new(sync.Mutex),
+		tr:                    tokenResp,
+		HTTPClient:            http.DefaultClient,
 	}
 }
 
