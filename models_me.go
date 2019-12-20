@@ -2,11 +2,6 @@ package tado
 
 import "net/http"
 
-type input interface {
-	method() string
-	path() string
-}
-
 // Me contains the users data.
 type Me struct {
 	Name     string `json:"name"`

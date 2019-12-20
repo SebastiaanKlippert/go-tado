@@ -16,14 +16,3 @@ func TestNewClient(t *testing.T) {
 	assert.Equal(t, c.accessTokenValidUntil, time.Time{})
 	assert.Equal(t, defaultBaseURL, c.baseURL, "baseURL is incorrect")
 }
-
-/*
-func TestClient_GetMe(t *testing.T) {
-	c := NewClient("", "")
-	m, err := c.GetMe()
-	if err != nil {
-		t.Fatal(err)
-	}
-	log.Printf("%+v\n", m)
-}
-*/

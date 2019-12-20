@@ -66,3 +66,23 @@ func (c *Client) GetMe() (*GetMeOutput, error) {
 	}
 	return out, nil
 }
+
+// GetHome return the Home data for a single home ID.
+func (c *Client) GetHome(in *GetHomeInput) (*GetHomeOutput, error) {
+	out := new(GetHomeOutput)
+	err := c.do(in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetZones return the zones for a single home ID.
+func (c *Client) GetZones(in *GetZonesInput) (GetZonesOutput, error) {
+	out := make(GetZonesOutput, 0)
+	err := c.do(in, &out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}

@@ -11,6 +11,11 @@ import (
 
 const defaultBaseURL = "https://my.tado.com/api"
 
+type input interface {
+	method() string
+	path() string
+}
+
 func (c *Client) do(in input, out interface{}) error {
 	// ensure accesstoken is still valid
 	err := c.validateAccessToken()
