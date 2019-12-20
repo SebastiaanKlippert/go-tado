@@ -19,7 +19,8 @@ func (th *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	th.hf(w, r)
 }
 
-func TestGetToken(t *testing.T) {
+func TestClient_GetToken(t *testing.T) {
+	c := NewClient()
 	incomingBody := ""
 	responseBody := ""
 	responseStatusCode := 0
@@ -46,7 +47,7 @@ func TestGetToken(t *testing.T) {
 	responseStatusCode = http.StatusBadRequest
 	responseBody = `{"error": "invalid_grant", "error_description": "Bad credentials"}`
 
-	tokenResponse, err := GetToken(username, password)
+	tokenResponse, err := c.GetToken(username, password)
 
 	assert.Equal(t, "client_id=tado-web-app&client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc&grant_type=password&password=PassW0rd&scope=home.user&username=fake%40sample.com", incomingBody)
 	if assert.Error(t, err) {
@@ -58,7 +59,7 @@ func TestGetToken(t *testing.T) {
 	responseStatusCode = http.StatusInternalServerError
 	responseBody = "Bad Gateway"
 
-	tokenResponse, err = GetToken(username, password)
+	tokenResponse, err = c.GetToken(username, password)
 
 	if assert.Error(t, err) {
 		assert.Equal(t, "authentication error: HTTP status 500: Bad Gateway", err.Error())
@@ -68,7 +69,7 @@ func TestGetToken(t *testing.T) {
 	// test against wrong endpoint
 	endpoint = "invalidhost"
 
-	tokenResponse, err = GetToken(username, password)
+	tokenResponse, err = c.GetToken(username, password)
 
 	if assert.Error(t, err) {
 		assert.True(t, strings.HasPrefix(err.Error(), "authentication HTTP error: "))
@@ -80,7 +81,7 @@ func TestGetToken(t *testing.T) {
 	responseStatusCode = http.StatusOK
 	responseBody = "Not JSON"
 
-	tokenResponse, err = GetToken(username, password)
+	tokenResponse, err = c.GetToken(username, password)
 
 	if assert.Error(t, err) {
 		assert.True(t, strings.HasPrefix(err.Error(), "authentication JSON error: "), "Prefix does not match, have %s", err.Error())
@@ -98,7 +99,7 @@ func TestGetToken(t *testing.T) {
     "jti": "0000"
 	}`
 
-	tokenResponse, err = GetToken(username, password)
+	tokenResponse, err = c.GetToken(username, password)
 	assert.NoError(t, err)
 
 	if assert.NotNil(t, tokenResponse) {
@@ -109,7 +110,8 @@ func TestGetToken(t *testing.T) {
 	}
 }
 
-func TestRefreshToken(t *testing.T) {
+func TestClient_TestRefreshToken(t *testing.T) {
+	c := NewClient()
 	incomingBody := ""
 	responseBody := ""
 	responseStatusCode := 0
@@ -133,7 +135,7 @@ func TestRefreshToken(t *testing.T) {
 	responseStatusCode = http.StatusOK
 	responseBody = `{"access_token": "t0ken"}`
 
-	tokenResponse, err := RefreshToken("ABCdef123")
+	tokenResponse, err := c.RefreshToken("ABCdef123")
 
 	assert.Equal(t, "client_id=tado-web-app&client_secret=wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc&grant_type=refresh_token&refresh_token=ABCdef123&scope=home.user", incomingBody)
 	assert.NoError(t, err)

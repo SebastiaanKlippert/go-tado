@@ -10,20 +10,25 @@ import (
 
 // Client is the main client used to communicate with the Tado API.
 type Client struct {
-	HTTPClient            *http.Client
+	HTTPClient *http.Client
+
+	authClient            *tadoauth.Client
 	baseURL               string
+	username, password    string
 	tr                    *tadoauth.TokenResponse
 	accessTokenValidUntil time.Time
 	mutex                 *sync.Mutex
 }
 
 // NewClient returns a new Tado client.
-func NewClient(tokenResp *tadoauth.TokenResponse) *Client {
+func NewClient(username, password string) *Client {
 	return &Client{
-		accessTokenValidUntil: time.Now().Add(time.Duration(tokenResp.ExpiresIn) * time.Second),
+		username:              username,
+		password:              password,
+		accessTokenValidUntil: time.Time{},
 		baseURL:               defaultBaseURL,
 		mutex:                 new(sync.Mutex),
-		tr:                    tokenResp,
+		authClient:            tadoauth.NewClient(),
 		HTTPClient:            http.DefaultClient,
 	}
 }
@@ -35,13 +40,19 @@ func (c *Client) validateAccessToken() error {
 	if c.accessTokenValidUntil.After(time.Now().Add(5 * time.Second)) {
 		return nil
 	}
-	// access token will expire soon, exchange refresh token for new access token
-	tr, err := tadoauth.RefreshToken(c.tr.RefreshToken)
+	// access token is expired, or will expire soon, get a new one
+	var err error
+	if c.tr != nil && c.tr.RefreshToken != "" {
+		// exchange refresh token for new access token
+		c.tr, err = c.authClient.RefreshToken(c.tr.RefreshToken)
+	} else {
+		// get new token based on username and password
+		c.tr, err = c.authClient.GetToken(c.username, c.password)
+	}
 	if err != nil {
 		return err
 	}
-	c.tr = tr
-	c.accessTokenValidUntil = time.Now().Add(time.Duration(tr.ExpiresIn) * time.Second)
+	c.accessTokenValidUntil = time.Now().Add(time.Duration(c.tr.ExpiresIn) * time.Second)
 	return nil
 }
 

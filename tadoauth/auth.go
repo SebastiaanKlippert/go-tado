@@ -18,14 +18,25 @@ const (
 
 var endpoint = defaultEndpoint
 
-func do(data url.Values) (*TokenResponse, error) {
+// Client is the main client used to communicate with the Tado authentication API.
+type Client struct {
+	HTTPClient *http.Client
+}
+
+func NewClient() *Client {
+	return &Client{
+		HTTPClient: http.DefaultClient,
+	}
+}
+
+func (c *Client) do(data url.Values) (*TokenResponse, error) {
 	// set common form data
 	data.Set("client_id", clientID)
 	data.Set("client_secret", clientSecret)
 	data.Set("scope", scope)
 
 	// post form
-	resp, err := http.PostForm(endpoint, data)
+	resp, err := c.HTTPClient.PostForm(endpoint, data)
 	if err != nil {
 		return nil, fmt.Errorf("authentication HTTP error: %s", err)
 	}
@@ -60,20 +71,20 @@ func do(data url.Values) (*TokenResponse, error) {
 }
 
 // GetToken returns a new authentication and refresh token for a user
-func GetToken(username, password string) (*TokenResponse, error) {
+func (c *Client) GetToken(username, password string) (*TokenResponse, error) {
 	// set form data
 	data := url.Values{}
 	data.Set("grant_type", "password")
 	data.Set("username", username)
 	data.Set("password", password)
-	return do(data)
+	return c.do(data)
 }
 
 // RefreshToken exchanges a refresh token for a new authentication token
-func RefreshToken(refreshToken string) (*TokenResponse, error) {
+func (c *Client) RefreshToken(refreshToken string) (*TokenResponse, error) {
 	// set form data
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", refreshToken)
-	return do(data)
+	return c.do(data)
 }

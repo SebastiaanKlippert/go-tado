@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/SebastiaanKlippert/go-tado/tadoauth"
 	"github.com/stretchr/testify/assert"
@@ -42,7 +43,7 @@ type testOut struct {
 func TestClient_Do(t *testing.T) {
 	// Create mock authentication struct
 	tr := &tadoauth.TokenResponse{
-		AccessToken:  "token",
+		AccessToken:  "thisIsAFakeToken",
 		TokenType:    "bearer",
 		RefreshToken: "refreshToken",
 		ExpiresIn:    588,
@@ -50,7 +51,10 @@ func TestClient_Do(t *testing.T) {
 		Jti:          "jti",
 	}
 	// Create mock Tado client
-	c := NewClient(tr)
+	c := NewClient("", "")
+	c.tr = tr
+	c.accessTokenValidUntil = time.Now().Add(time.Minute)
+
 	// Prepare fake output
 	out := new(testOut)
 
@@ -74,10 +78,14 @@ func TestClient_Do(t *testing.T) {
 
 	err := c.do(tg, out)
 
+	if incomingRequest == nil {
+		t.Fatal("incomingRequest is nil")
+	}
+
 	assert.Equal(t, http.MethodGet, incomingRequest.Method)
 	assert.Equal(t, "/v1/somepath", incomingRequest.URL.String())
 	assert.Equal(t, "", string(incomingRequestBody))
-	assert.Equal(t, "Bearer token", incomingRequest.Header.Get("Authorization"))
+	assert.Equal(t, "Bearer thisIsAFakeToken", incomingRequest.Header.Get("Authorization"))
 	if assert.Error(t, err) {
 		assert.Equal(t, "error: HTTP status 400: Bad request", err.Error())
 	}
