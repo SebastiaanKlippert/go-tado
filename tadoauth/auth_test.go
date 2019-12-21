@@ -11,14 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testHandler struct {
-	hf http.HandlerFunc
-}
-
-func (th *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	th.hf(w, r)
-}
-
 func TestClient_GetToken(t *testing.T) {
 	c := NewClient()
 	incomingBody := ""
@@ -26,14 +18,12 @@ func TestClient_GetToken(t *testing.T) {
 	responseStatusCode := 0
 
 	// create test handler for mock auth server
-	th := &testHandler{
-		hf: func(w http.ResponseWriter, r *http.Request) {
-			s, _ := ioutil.ReadAll(r.Body)
-			incomingBody = string(s)
-			w.WriteHeader(responseStatusCode)
-			_, _ = fmt.Fprint(w, responseBody)
-		},
-	}
+	th := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s, _ := ioutil.ReadAll(r.Body)
+		incomingBody = string(s)
+		w.WriteHeader(responseStatusCode)
+		_, _ = fmt.Fprint(w, responseBody)
+	})
 
 	// start mock server
 	testServer := httptest.NewServer(th)
@@ -117,14 +107,12 @@ func TestClient_TestRefreshToken(t *testing.T) {
 	responseStatusCode := 0
 
 	// create test handler for mock auth server
-	th := &testHandler{
-		hf: func(w http.ResponseWriter, r *http.Request) {
-			s, _ := ioutil.ReadAll(r.Body)
-			incomingBody = string(s)
-			w.WriteHeader(responseStatusCode)
-			_, _ = fmt.Fprint(w, responseBody)
-		},
-	}
+	th := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s, _ := ioutil.ReadAll(r.Body)
+		incomingBody = string(s)
+		w.WriteHeader(responseStatusCode)
+		_, _ = fmt.Fprint(w, responseBody)
+	})
 
 	// start mock server
 	testServer := httptest.NewServer(th)
