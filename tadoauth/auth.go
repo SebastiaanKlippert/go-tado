@@ -23,6 +23,7 @@ type Client struct {
 	HTTPClient *http.Client
 }
 
+// NewClient is the constructor for the authentication client.
 func NewClient() *Client {
 	return &Client{
 		HTTPClient: http.DefaultClient,

@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	HomeStateHome = "HOME"
-	HomeStateAway = "AWAY"
+	HomeStateHome = "HOME" // HomeStateHome is the value of presence used when home
+	HomeStateAway = "AWAY" // HomeStateAway is the value of presence used when away
 )
 
 // HomeState is the state of a home

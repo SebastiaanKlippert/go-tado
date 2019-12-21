@@ -6,35 +6,46 @@ import (
 	"time"
 )
 
+// TerminationType is an enum type for overlay termination types
 type TerminationType string
 
 const (
-	TerminationTypeManual   TerminationType = "MANUAL"
-	TerminationTypeTimer    TerminationType = "TIMER"
+	//TerminationTypeManual is used for manual termination
+	TerminationTypeManual TerminationType = "MANUAL"
+
+	// TerminationTypeTimer is used for automation termination, use property DurationInSeconds to set the timer duration
+	TerminationTypeTimer TerminationType = "TIMER"
+
+	// TerminationTypeTadoMode is used to terminate this setting by Tado, the overlay ends when the schema changes
 	TerminationTypeTadoMode TerminationType = "TADO_MODE"
 )
 
+// OverlayInput is the main input for an overlay
 type OverlayInput struct {
 	Setting     OverlayInputSetting     `json:"setting"`
 	Termination OverlayInputTermination `json:"termination"`
 }
 
+// OverlayInputSetting contains the settings for the overlay
 type OverlayInputSetting struct {
 	Type        string                  `json:"type"`
 	Power       string                  `json:"power"`
 	Temperature OverlayInputTemperature `json:"temperature"`
 }
 
+// OverlayInputTermination contains the termination settings for the overlay
 type OverlayInputTermination struct {
 	Type              TerminationType `json:"type"`
 	DurationInSeconds int             `json:"durationInSeconds,omitempty"`
 }
 
+// OverlayInputTemperature contains the temperature settings for the overlay
 type OverlayInputTemperature struct {
 	Celsius    float64 `json:"celsius,omitempty"`
 	Fahrenheit float64 `json:"fahrenheit,omitempty"`
 }
 
+// OverlayOutput is the output for a successful overlay update
 type OverlayOutput struct {
 	Type    string `json:"type"`
 	Setting struct {
