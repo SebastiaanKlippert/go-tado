@@ -56,7 +56,7 @@ func (c *Client) validateAccessToken() error {
 	return nil
 }
 
-// GetMe return the users data from the API.
+// GetMe returns the users data from the API.
 func (c *Client) GetMe() (*GetMeOutput, error) {
 	in := new(GetMeInput)
 	out := new(GetMeOutput)
@@ -67,7 +67,7 @@ func (c *Client) GetMe() (*GetMeOutput, error) {
 	return out, nil
 }
 
-// GetHome return the Home data for a single home ID.
+// GetHome returns the Home data for a single home.
 func (c *Client) GetHome(in *GetHomeInput) (*GetHomeOutput, error) {
 	out := new(GetHomeOutput)
 	err := c.do(in, out)
@@ -77,10 +77,51 @@ func (c *Client) GetHome(in *GetHomeInput) (*GetHomeOutput, error) {
 	return out, nil
 }
 
-// GetZones return the zones for a single home ID.
+// GetZones returns the zones for a single home.
 func (c *Client) GetZones(in *GetZonesInput) (GetZonesOutput, error) {
 	out := make(GetZonesOutput, 0)
 	err := c.do(in, &out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetHomeState returns the presence state for a single home.
+func (c *Client) GetHomeState(in *GetHomeStateInput) (*GetHomeStateOutput, error) {
+	out := new(GetHomeStateOutput)
+	err := c.do(in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetZoneState returns the state for a single zone within a home.
+func (c *Client) GetZoneState(in *GetZoneStateInput) (*GetZoneStateOutput, error) {
+	out := new(GetZoneStateOutput)
+	err := c.do(in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GetWeather returns the weather info for a home.
+func (c *Client) GetWeather(in *GetWeatherInput) (*GetWeatherOutput, error) {
+	out := new(GetWeatherOutput)
+	err := c.do(in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PutOverlay sets an overlay in a zone, it can be used to contol settings overruling a schema.
+// For example to set the heating or hot water.
+func (c *Client) PutOverlay(in *PutOverlayInput) (*PutOverlayOutput, error) {
+	out := new(PutOverlayOutput)
+	err := c.do(in, out)
 	if err != nil {
 		return nil, err
 	}

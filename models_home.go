@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Home is the info for a single home
 type Home struct {
 	ID                         int           `json:"id"`
 	Name                       string        `json:"name"`
@@ -17,7 +18,7 @@ type Home struct {
 	SimpleSmartScheduleEnabled bool          `json:"simpleSmartScheduleEnabled"`
 	AwayRadiusInMeters         float64       `json:"awayRadiusInMeters"`
 	UsePreSkillsApps           bool          `json:"usePreSkillsApps"`
-	Skills                     []interface{} `json:"skills"` //TODO define
+	Skills                     []interface{} `json:"skills"` // TODO
 	ChristmasModeEnabled       bool          `json:"christmasModeEnabled"`
 	ShowAutoAssistReminders    bool          `json:"showAutoAssistReminders"`
 	ContactDetails             struct {
@@ -40,7 +41,7 @@ type Home struct {
 	ConsentGrantSkippable bool `json:"consentGrantSkippable"`
 }
 
-// GetHomeInput is the input for GetMe
+// GetHomeInput is the input for GetHome
 type GetHomeInput struct {
 	HomeID int
 }
@@ -53,7 +54,11 @@ func (ghi *GetHomeInput) path() string {
 	return fmt.Sprintf("/v2/homes/%d", ghi.HomeID)
 }
 
-// GetHomeOutput is the output for GetMe
+func (ghi *GetHomeInput) body() interface{} {
+	return nil
+}
+
+// GetHomeOutput is the output for GetHome
 type GetHomeOutput struct {
 	Home
 }

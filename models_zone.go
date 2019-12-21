@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Zone contains info about a single zone
 type Zone struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
@@ -45,7 +46,7 @@ type Zone struct {
 	} `json:"openWindowDetection"`
 }
 
-// GetZonesInput is the input for GetMe
+// GetZonesInput is the input for GetZones
 type GetZonesInput struct {
 	HomeID int
 }
@@ -58,5 +59,9 @@ func (gzi *GetZonesInput) path() string {
 	return fmt.Sprintf("/v2/homes/%d/zones", gzi.HomeID)
 }
 
-// GetZonesOutput is the output for GetMe
+func (gzi *GetZonesInput) body() interface{} {
+	return nil
+}
+
+// GetZonesOutput is the output for GetZones
 type GetZonesOutput []Zone

@@ -2,6 +2,7 @@ package tado
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -39,7 +40,7 @@ func TestClient_GetMe(t *testing.T) {
 		called = true
 		assert.Equal(t, "/v1/me", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
-		_, _ = fmt.Fprintln(w, `{"name":"SK"}`)
+		_, _ = fmt.Fprint(w, `{"name":"SK"}`)
 	}
 
 	client, server := setupTestClientAndServer(f)
@@ -63,7 +64,7 @@ func TestClient_GetHome(t *testing.T) {
 		called = true
 		assert.Equal(t, "/v2/homes/12345", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
-		_, _ = fmt.Fprintln(w, `{"id": 12345}`)
+		_, _ = fmt.Fprint(w, `{"id": 12345}`)
 	}
 
 	client, server := setupTestClientAndServer(f)
@@ -91,7 +92,7 @@ func TestClient_GetZones(t *testing.T) {
 		called = true
 		assert.Equal(t, "/v2/homes/12345/zones", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
-		_, _ = fmt.Fprintln(w, `[{"id": 1}, {"id": 2}]`)
+		_, _ = fmt.Fprint(w, `[{"id": 1}, {"id": 2}]`)
 	}
 
 	client, server := setupTestClientAndServer(f)
@@ -110,5 +111,133 @@ func TestClient_GetZones(t *testing.T) {
 	if assert.NotEmpty(t, z) && assert.Equal(t, 2, len(z)) {
 		assert.Equal(t, 1, z[0].ID)
 		assert.Equal(t, 2, z[1].ID)
+	}
+}
+
+func TestClient_GetHomeState(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/state", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `{"presence": "HOME"}`)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &GetHomeStateInput{
+		HomeID: 12345,
+	}
+
+	s, err := client.GetHomeState(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotNil(t, s) {
+		assert.Equal(t, HomeStateHome, s.Presence)
+	}
+}
+
+func TestClient_GetZoneState(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/zones/2/state", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `{"tadoMode": "HOME"}`)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &GetZoneStateInput{
+		HomeID: 12345,
+		ZoneID: 2,
+	}
+
+	s, err := client.GetZoneState(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotNil(t, s) {
+		assert.Equal(t, "HOME", s.TadoMode)
+	}
+}
+
+func TestClient_GetWeather(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/weather", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `{"outsideTemperature": {"celsius": 8.50}}`)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &GetWeatherInput{
+		HomeID: 12345,
+	}
+
+	w, err := client.GetWeather(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotNil(t, w) {
+		assert.Equal(t, 8.5, w.OutsideTemperature.Celsius)
+	}
+}
+
+func TestClient_PutOverlay(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/zones/99/overlay", r.URL.Path)
+		assert.Equal(t, http.MethodPut, r.Method)
+		b, _ := ioutil.ReadAll(r.Body)
+		assert.Equal(t, `{"setting":{"type":"HEATING","power":"ON","temperature":{"celsius":17}},"termination":{"type":"MANUAL"}}`+"\n", string(b))
+		_, _ = fmt.Fprint(w, `{"type": "MANUAL"}`)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &PutOverlayInput{
+		HomeID: 12345,
+		ZoneID: 99,
+		OverlayInput: OverlayInput{
+			Setting: OverlayInputSetting{
+				Type:  "HEATING",
+				Power: "ON",
+				Temperature: OverlayInputTemperature{
+					Celsius: 17,
+				},
+			},
+			Termination: OverlayInputTermination{
+				Type: TerminationTypeManual,
+			},
+		},
+	}
+
+	o, err := client.PutOverlay(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotNil(t, o) {
+		assert.Equal(t, "MANUAL", o.Type)
 	}
 }

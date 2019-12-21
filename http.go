@@ -14,6 +14,7 @@ const defaultBaseURL = "https://my.tado.com/api"
 type input interface {
 	method() string
 	path() string
+	body() interface{}
 }
 
 func (c *Client) do(in input, out interface{}) error {
@@ -28,7 +29,7 @@ func (c *Client) do(in input, out interface{}) error {
 	switch in.method() {
 	case http.MethodPost, http.MethodPut:
 		buf := new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(in)
+		err := json.NewEncoder(buf).Encode(in.body())
 		if err != nil {
 			return fmt.Errorf("error encoding input: %s", err)
 		}
@@ -43,6 +44,11 @@ func (c *Client) do(in input, out interface{}) error {
 
 	// set authentication header
 	req.Header.Set("Authorization", "Bearer "+c.tr.AccessToken)
+
+	// set content type if needed
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
 
 	// execute HTTP request
 	resp, err := c.HTTPClient.Do(req)

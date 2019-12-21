@@ -2,7 +2,7 @@ package tado
 
 import "net/http"
 
-// Me contains the users data.
+// Me contains the users data
 type Me struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
@@ -23,6 +23,10 @@ func (gmi *GetMeInput) method() string {
 
 func (gmi *GetMeInput) path() string {
 	return "/v1/me"
+}
+
+func (gmi *GetMeInput) body() interface{} {
+	return nil
 }
 
 // GetMeOutput is the output for GetMe

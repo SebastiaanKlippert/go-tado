@@ -23,6 +23,10 @@ func (tg *testGet) path() string {
 	return "/v1/somepath"
 }
 
+func (tg *testGet) body() interface{} {
+	return nil
+}
+
 type testPost struct {
 	InStr string
 	InInt int
@@ -34,6 +38,10 @@ func (tp *testPost) method() string {
 
 func (tp *testPost) path() string {
 	return "/v1/somepath"
+}
+
+func (tp *testPost) body() interface{} {
+	return tp
 }
 
 type testOut struct {
@@ -121,5 +129,6 @@ func TestClient_Do(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, `{"InStr":"string","InInt":999}`+"\n", string(incomingRequestBody))
 	assert.Equal(t, http.MethodPost, incomingRequest.Method)
+	assert.Equal(t, "application/json", incomingRequest.Header.Get("Content-Type"))
 	assert.Equal(t, "AbCdEfGh", out.OutField)
 }
