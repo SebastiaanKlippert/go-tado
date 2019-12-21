@@ -5,6 +5,9 @@
 
 
 # go-tado
-Basic Tado API implementation for go
 
-Work in progress
+![tado°](https://sklippert.s3-eu-central-1.amazonaws.com/public/tado_logo.png)
+
+Basic Tado API client written in go.
+
+*Work in progress*
