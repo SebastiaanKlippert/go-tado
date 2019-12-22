@@ -90,7 +90,7 @@ func TestClient_GetMe(t *testing.T) {
 	called := false
 	f := func(w http.ResponseWriter, r *http.Request) {
 		called = true
-		assert.Equal(t, "/v1/me", r.URL.Path)
+		assert.Equal(t, "/v2/me", r.URL.Path)
 		assert.Equal(t, http.MethodGet, r.Method)
 		_, _ = fmt.Fprint(w, `{"name":"SK"}`)
 	}
