@@ -8,11 +8,16 @@ import (
 	"github.com/SebastiaanKlippert/go-tado/tadoauth"
 )
 
+type authClient interface {
+	GetToken(username, password string) (*tadoauth.TokenResponse, error)
+	RefreshToken(refreshToken string) (*tadoauth.TokenResponse, error)
+}
+
 // Client is the main client used to communicate with the Tado API.
 type Client struct {
 	HTTPClient *http.Client
 
-	authClient            *tadoauth.Client
+	authClient            authClient
 	baseURL               string
 	username, password    string
 	tr                    *tadoauth.TokenResponse

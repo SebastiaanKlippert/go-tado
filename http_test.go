@@ -132,3 +132,25 @@ func TestClient_Do(t *testing.T) {
 	assert.Equal(t, "application/json", incomingRequest.Header.Get("Content-Type"))
 	assert.Equal(t, "AbCdEfGh", out.OutField)
 }
+
+func TestInputMethods(t *testing.T) {
+	//test that body is not nil for PUT and POST methods and is nil for all other methods
+	testStructs := []input{
+		new(GetMeInput),
+		new(GetHomeInput),
+		new(GetHomeStateInput),
+		new(GetZonesInput),
+		new(GetZoneStateInput),
+		new(GetWeatherInput),
+		new(PutOverlayInput),
+	}
+
+	for _, s := range testStructs {
+		switch s.method() {
+		case http.MethodPut, http.MethodPost:
+			assert.NotNil(t, s.body(), "body is nil on %T with method %s", s, s.method())
+		default:
+			assert.Nil(t, s.body(), "body is not nil on %T with method %s", s, s.method())
+		}
+	}
+}

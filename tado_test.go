@@ -22,6 +22,58 @@ func TestNewClient(t *testing.T) {
 	assert.Equal(t, defaultBaseURL, c.baseURL, "baseURL is incorrect")
 }
 
+type mockAuthClient struct {
+	username, password, refreshToken string
+}
+
+func (m *mockAuthClient) GetToken(username, password string) (*tadoauth.TokenResponse, error) {
+	m.username = username
+	m.password = password
+	return &tadoauth.TokenResponse{}, nil
+}
+
+func (m *mockAuthClient) RefreshToken(refreshToken string) (*tadoauth.TokenResponse, error) {
+	m.refreshToken = refreshToken
+	return &tadoauth.TokenResponse{}, nil
+}
+
+func TestClient_validateAccessToken(t *testing.T) {
+	// create new client with expired token
+	c := NewClient("username1", "password1")
+	c.tr = &tadoauth.TokenResponse{
+		RefreshToken: "",
+	}
+
+	// construct mock auth client
+	mockAuth := new(mockAuthClient)
+	c.authClient = mockAuth
+
+	// use testserver that returns an empty json response
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprint(w, `{}`)
+	}))
+	c.baseURL = s.URL
+
+	// call any method
+	_, err := c.GetMe()
+
+	// check if authentication methods have been called
+	assert.NoError(t, err)
+	assert.Equal(t, "username1", mockAuth.username)
+	assert.Equal(t, "password1", mockAuth.password)
+
+	// now check if refreshtoken method is being called
+	c.accessTokenValidUntil = time.Time{}
+	c.tr = &tadoauth.TokenResponse{
+		RefreshToken: "fakeRefreshToken",
+	}
+
+	_, err = c.GetMe()
+
+	assert.NoError(t, err)
+	assert.Equal(t, "fakeRefreshToken", mockAuth.refreshToken)
+}
+
 func setupTestClientAndServer(hf http.HandlerFunc) (*Client, *httptest.Server) {
 	s := httptest.NewServer(hf)
 	c := NewClient("username", "password")
