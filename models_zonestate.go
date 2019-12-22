@@ -20,12 +20,42 @@ type ZoneState struct {
 			Fahrenheit float64 `json:"fahrenheit"`
 		} `json:"temperature"`
 	} `json:"setting"`
-	OverlayType        interface{} `json:"overlayType"`        // TODO
-	Overlay            interface{} `json:"overlay"`            // TODO
-	OpenWindow         interface{} `json:"openWindow"`         // TODO
-	NextScheduleChange interface{} `json:"nextScheduleChange"` // TODO
-	NextTimeBlock      interface{} `json:"nextTimeBlock"`      // TODO
-	Link               struct {
+	OverlayType string `json:"overlayType"`
+	Overlay     struct {
+		Type    string `json:"type"`
+		Setting struct {
+			Type        string `json:"type"`
+			Power       string `json:"power"`
+			Temperature struct {
+				Celsius    float64 `json:"celsius"`
+				Fahrenheit float64 `json:"fahrenheit"`
+			} `json:"temperature"`
+		} `json:"setting"`
+		Termination struct {
+			Type                   string    `json:"type"`
+			TypeSkillBasedApp      string    `json:"typeSkillBasedApp"`
+			DurationInSeconds      int       `json:"durationInSeconds"`
+			Expiry                 time.Time `json:"expiry"`
+			RemainingTimeInSeconds int       `json:"remainingTimeInSeconds"`
+			ProjectedExpiry        time.Time `json:"projectedExpiry"`
+		} `json:"termination"`
+	} `json:"overlay"`
+	OpenWindow         interface{} `json:"openWindow"` // TODO
+	NextScheduleChange struct {
+		Start   time.Time `json:"start"`
+		Setting struct {
+			Type        string `json:"type"`
+			Power       string `json:"power"`
+			Temperature struct {
+				Celsius    float64 `json:"celsius"`
+				Fahrenheit float64 `json:"fahrenheit"`
+			} `json:"temperature"`
+		} `json:"setting"`
+	} `json:"nextScheduleChange"`
+	NextTimeBlock struct {
+		Start time.Time `json:"start"`
+	} `json:"nextTimeBlock"`
+	Link struct {
 		State string `json:"state"`
 	} `json:"link"`
 	ActivityDataPoints struct {

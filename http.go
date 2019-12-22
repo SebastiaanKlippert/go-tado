@@ -68,6 +68,11 @@ func (c *Client) do(in input, out interface{}) error {
 		return fmt.Errorf("error: HTTP status %d: %s", resp.StatusCode, string(body))
 	}
 
+	// for NoContent we do not decode any JSON
+	if resp.StatusCode == http.StatusNoContent {
+		return nil
+	}
+
 	// OK response, decode into output
 	err = json.NewDecoder(resp.Body).Decode(out)
 	if err != nil {

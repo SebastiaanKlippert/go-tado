@@ -122,10 +122,30 @@ func (c *Client) GetWeather(in *GetWeatherInput) (*GetWeatherOutput, error) {
 	return out, nil
 }
 
+// GetDayReport returns a detailed zone report of a specific date.
+func (c *Client) GetDayReport(in *GetDayReportInput) (*GetDayReportOutput, error) {
+	out := new(GetDayReportOutput)
+	err := c.do(in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PutOverlay sets an overlay in a zone, it can be used to contol settings overruling a schema.
 // For example to set the heating or hot water.
 func (c *Client) PutOverlay(in *PutOverlayInput) (*PutOverlayOutput, error) {
 	out := new(PutOverlayOutput)
+	err := c.do(in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// DeleteOverlay deletes an overlay for a zone.
+func (c *Client) DeleteOverlay(in *DeleteOverlayInput) (*DeleteOverlayOutput, error) {
+	out := new(DeleteOverlayOutput)
 	err := c.do(in, out)
 	if err != nil {
 		return nil, err

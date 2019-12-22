@@ -142,7 +142,9 @@ func TestInputMethods(t *testing.T) {
 		new(GetZonesInput),
 		new(GetZoneStateInput),
 		new(GetWeatherInput),
+		new(GetDayReportInput),
 		new(PutOverlayInput),
+		new(DeleteOverlayInput),
 	}
 
 	for _, s := range testStructs {

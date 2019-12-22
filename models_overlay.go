@@ -89,3 +89,24 @@ func (poi *PutOverlayInput) body() interface{} {
 type PutOverlayOutput struct {
 	OverlayOutput
 }
+
+// DeleteOverlayInput is the input for DeleteOverlay
+type DeleteOverlayInput struct {
+	HomeID int
+	ZoneID int
+}
+
+func (poi *DeleteOverlayInput) method() string {
+	return http.MethodDelete
+}
+
+func (poi *DeleteOverlayInput) path() string {
+	return fmt.Sprintf("/v2/homes/%d/zones/%d/overlay", poi.HomeID, poi.ZoneID)
+}
+
+func (poi *DeleteOverlayInput) body() interface{} {
+	return nil
+}
+
+// DeleteOverlayOutput is the output for DeleteOverlay
+type DeleteOverlayOutput struct{}

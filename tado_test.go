@@ -251,6 +251,37 @@ func TestClient_GetWeather(t *testing.T) {
 	}
 }
 
+func TestClient_GetDayReport(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/zones/2/dayReport", r.URL.Path)
+		assert.Equal(t, "date=2020-12-31", r.URL.RawQuery)
+		assert.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `{"zoneType": "HEATING"}`)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &GetDayReportInput{
+		HomeID: 12345,
+		ZoneID: 2,
+		Date:   time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC),
+	}
+
+	r, err := client.GetDayReport(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotNil(t, r) {
+		assert.Equal(t, "HEATING", r.ZoneType)
+	}
+}
+
 func TestClient_PutOverlay(t *testing.T) {
 
 	called := false
@@ -291,5 +322,34 @@ func TestClient_PutOverlay(t *testing.T) {
 	assert.True(t, called)
 	if assert.NotNil(t, o) {
 		assert.Equal(t, "MANUAL", o.Type)
+	}
+}
+
+func TestClient_DeleteOverlay(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/zones/2/overlay", r.URL.Path)
+		assert.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &DeleteOverlayInput{
+		HomeID: 12345,
+		ZoneID: 2,
+	}
+
+	r, err := client.DeleteOverlay(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotNil(t, r) {
+		assert.Empty(t, r)
 	}
 }
