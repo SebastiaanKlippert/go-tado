@@ -139,6 +139,7 @@ func TestInputMethods(t *testing.T) {
 		new(GetMeInput),
 		new(GetHomeInput),
 		new(GetHomeStateInput),
+		new(GetDevicesInput),
 		new(GetZonesInput),
 		new(GetZoneStateInput),
 		new(GetWeatherInput),

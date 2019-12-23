@@ -137,6 +137,35 @@ func TestClient_GetHome(t *testing.T) {
 	}
 }
 
+func TestClient_GetDevices(t *testing.T) {
+
+	called := false
+	f := func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "/v2/homes/12345/devices", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `[{"deviceType": "A"}, {"deviceType": "B"}]`)
+	}
+
+	client, server := setupTestClientAndServer(f)
+	defer server.Close()
+
+	in := &GetDevicesInput{
+		HomeID: 12345,
+	}
+
+	d, err := client.GetDevices(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.True(t, called)
+	if assert.NotEmpty(t, d) && assert.Equal(t, 2, len(d)) {
+		assert.Equal(t, "A", d[0].DeviceType)
+		assert.Equal(t, "B", d[1].DeviceType)
+	}
+}
+
 func TestClient_GetZones(t *testing.T) {
 
 	called := false
