@@ -142,6 +142,7 @@ func TestInputMethods(t *testing.T) {
 		new(GetDevicesInput),
 		new(GetZonesInput),
 		new(GetZoneStateInput),
+		new(GetUsersInput),
 		new(GetWeatherInput),
 		new(GetDayReportInput),
 		new(PutOverlayInput),

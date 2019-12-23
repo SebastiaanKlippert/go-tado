@@ -92,6 +92,16 @@ func (c *Client) GetDevices(in *GetDevicesInput) (GetDevicesOutput, error) {
 	return out, nil
 }
 
+// GetUsers returns the users in a home.
+func (c *Client) GetUsers(in *GetUsersInput) (GetUsersOutput, error) {
+	out := make(GetUsersOutput, 0)
+	err := c.do(in, &out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GetZones returns the zones for a single home.
 func (c *Client) GetZones(in *GetZonesInput) (GetZonesOutput, error) {
 	out := make(GetZonesOutput, 0)
